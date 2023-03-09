@@ -8,7 +8,7 @@ echo "创建geovis用户，组(geovis)，id(1001), home(/home/geovis)"
 if id -u 'geovis' > /dev/null 2>&1 ; then
    echo "geovis用户已经存在"
 else
-   useradd -d "/home/geovis" -m -u 1001 -p "123456789" -s "/bin/bash" geovis \
+   useradd -d "/home/geovis" -m -u 1001 -p "passwd" -s "/bin/bash" geovis \
    && echo "创建geovis用户成功"
 fi
 
