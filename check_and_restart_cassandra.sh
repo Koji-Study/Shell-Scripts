@@ -51,8 +51,8 @@ j=0
 command_restart="cd /cassandra/apache-cassandra-4.1.0/bin && nohup ./cassandra -R > /dev/null 2>&1"
 for ip in ${ip_list[@]};
 do
-        ps_result=$(sshpass -p passwd ssh -o StrictHostKeychecking=no ubuntu@"$ip" "ps -ef |grep cassandra")
-        if [ ${#ps_result[*]} -ge 2 ]; then
+        ps_result=$(sshpass -p passwd ssh -o StrictHostKeychecking=no ubuntu@"$ip" "ps -ef |grep -v grep | grep org.apache.cassandra.service.CassandraDaemon")
+        if [ -n "$ps_result" ]; then
                 process_list[$m]=$ip
                 let m++
         else
