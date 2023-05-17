@@ -1,6 +1,6 @@
 #!/bin/bash
 function send(){
-webhook="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=qiyeweixin"
+webhook="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=3c2953a2-d797-4da7-8501-78b9f8a51f0b"
 curl -X POST $webhook \
    -H 'Content-Type: application/json' \
    -d '
@@ -14,19 +14,19 @@ curl -X POST $webhook \
 
 
 function check(){
-ray_dev_list=("headip" "nodeip" "1.1.1.1" "2.2.2.2")
-ray_dev_pawd=('headpwd' 'nodepwd' 'pwd' 'pwd')
+ray_dev_list=("headip" "nodeip1" "nodeip2" "nodeip3")
+ray_dev_pawd=('headpwd' 'nodepwd' 'nodepwd' 'nodepwd')
 i=0
 x=0
 command_check="ps -ef | grep -v grep | grep /home/geovis/miniconda3/lib/python3.9/site-packages/ray/core/src/ray/raylet/raylet"
-command_stop="cd /home/geovis/miniconda3/bin && ray stop"
-commang_start="cgexec -g memory:ray ./workspace/ray/start_ray.sh"
+#command_stop="cd /home/geovis/miniconda3/bin && ray stop"
+#commang_start="cgexec -g memory:ray ./workspace/ray/start_ray.sh"
+command_stop="ls"
+commang_start="ls"
 while(( i<${#ray_dev_list[@]} ))
 do
         ps_result=$(sshpass -p ${ray_dev_pawd[$i]} ssh -o StrictHostKeychecking=no root@"${ray_dev_list[$i]}" "$command_check")
-        echo ${ray_dev_list[$i]}
-        #echo ${ray_dev_pawd[$i]}
-        #echo ${ps_result}
+        echo '查询结果'${#ps_result}
         if [ ${#ps_result} -eq 0 ];then
                 down_list[$x]=${ray_dev_list[$i]}
                 down_list_pawd[$x]=${ray_dev_pawd[$i]}
@@ -36,7 +36,9 @@ do
 done
 echo 'down node:'${down_list[@]}
 if [ $x -gt 1 ]; then
-        if [ "${down_list[0]}"="headip" ]; then
+        #head节点down了，需要重启所有节点
+        if [ "${down_list[0]}" = "headip" ]; then
+                #数组转成字符串传参
                 restart "${ray_dev_list[*]}" "${ray_dev_pawd[*]}"
         else
                 restart "${down_list[*]}" "${down_list_pawd[*]}"
@@ -45,22 +47,12 @@ fi
 }
 
 function restart(){
-list=$1
-pawd=$2
+#传入的字符串转为数组
+restart_list=($1)
+restart_pawd=($2)
 m=0
-for num in ${list[*]};
-do
-        restart_list[$m]=$num
-        let m++
-done
-m=0
-for num in ${pawd[*]};
-do
-        restart_pawd[$m]=$num
-        let m++
-done
-m=0
-while(( m<${#restart_list[*]} ))
+#停了down的节点的ray
+while(( m<${#restart_list[@]} ))
 do
         nohup sshpass -p ${restart_pawd[$m]} ssh -o StrictHostKeychecking=no root@"${restart_list[$m]}" "$command_stop"  > /dev/null 2>&1 &
         echo 'stop'$m
@@ -69,6 +61,7 @@ done
 m=0
 f=0
 s=0
+#重新启动down的节点
 while(( m<${#restart_list[@]} ))
 do
         nohup sshpass -p ${restart_pawd[$m]} ssh -o StrictHostKeychecking=no root@"${restart_list[$m]}" "$command_start" > /dev/null 2>&1 &
