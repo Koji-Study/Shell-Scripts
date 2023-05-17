@@ -1,6 +1,6 @@
 #!/bin/bash
 function send(){
-webhook="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=3c2953a2-d797-4da7-8501-78b9f8a51f0b"
+webhook="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=qiyeweixin"
 curl -X POST $webhook \
    -H 'Content-Type: application/json' \
    -d '
