@@ -36,7 +36,7 @@ do
 done
 echo 'down node:'${down_list[@]}
 if [ $x -gt 1 ]; then
-        if [ "${down_list[0]}"="10.1.64.5" ]; then
+        if [ "${down_list[0]}"="headip" ]; then
                 restart "${ray_dev_list[*]}" "${ray_dev_pawd[*]}"
         else
                 restart "${down_list[*]}" "${down_list_pawd[*]}"
