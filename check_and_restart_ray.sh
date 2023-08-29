@@ -35,7 +35,7 @@ do
         let i++
 done
 echo 'down node:'${down_list[@]}
-if [ $x -gt 1 ]; then
+if [ $x -gt 0 ]; then
         #head节点down了，需要重启所有节点
         if [ "${down_list[0]}" = "headip" ]; then
                 #数组转成字符串传参
